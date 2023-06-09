@@ -10,39 +10,39 @@ select * from vaccinations order by 3,4;
 select location, date, total_cases, new_cases, total_deaths, population
 from Deaths order by 1,2;
 
--- Analizando el total de casos vs el total de muertes en un país
+-- Analizando el total de casos vs el total de muertes en un paÃ­s
 select location,date,total_cases, total_deaths, total_deaths/total_cases*100 as Letalidad
 from Deaths where location like '%argentina%' and continent is not null order by 1,2;
 
--- Analizando el total de casos vs la población en un país
+-- Analizando el total de casos vs la poblaciÃ³n en un paÃ­s
 select location,date,total_cases, population, total_cases/population*100 as infectionRate
 from Deaths where location like '%argentina%' and continent is not null order by 1,2;
 
--- ¿Qué país tiene la tasa de infección más alta en comparación con la población?
+-- Â¿QuÃ© paÃ­s tiene la tasa de infecciÃ³n mÃ¡s alta en comparaciÃ³n con la poblaciÃ³n?
 select location, MAX(total_cases) as CasosInfeccionMaximos, population, MAX(total_cases/population*100) as infectionRate
 from Deaths where continent is not null
 Group by location,population order by infectionRate desc;
 
--- ¿Cuáles son los países con el mayor número de muertes por población?
+-- Â¿CuÃ¡les son los paÃ­ses con el mayor nÃºmero de muertes por poblaciÃ³n?
 select location, MAX(cast(total_deaths as int)) as MayorCantMuertes, population, MAX(total_deaths/population*100) as Letalidad
 from Deaths where continent is not null
 Group by location,population
 order by Letalidad desc;
 
--- Mostrar los continentes con el mayor número de muertes por población
+-- Mostrar los continentes con el mayor nÃºmero de muertes por poblaciÃ³n
 select location,MAX(cast(total_deaths as int)) as MayorCantMuertes, MAX(total_deaths/population*100) as PercentageDeath
 from Deaths where continent is null
 Group by location
 order by MayorCantMuertes desc;
 
--- Obtener el número total de casos, muertes y el porcentaje de muertes a nivel global.
+-- Obtener el nÃºmero total de casos, muertes y el porcentaje de muertes a nivel global.
 select sum(new_cases) as CasosTotales, sum(cast(new_deaths as int)) as MuertesTotales,
 sum(cast(new_deaths as int))*100 / sum(new_cases) as Porcentaje_Muertes
 from Deaths where continent is not null;
 
--- Analizando la población total vs las vacunaciones
+-- Analizando la poblaciÃ³n total vs las vacunaciones
 -- Dos formas de hacerlo
--- Forma 1:Utilizando la cláusula WITH
+-- Forma 1:Utilizando la clÃ¡usula WITH
 with PopvsVac (continente, ubicacion, fecha , poblacion, nuevas_vacunaciones, personas_vacunadas_acumuladas)
 as (
 select deaths.continent, deaths.location, deaths.date , deaths.population, vaccinations.new_vaccinations,
@@ -56,8 +56,8 @@ where deaths.continent is not null
 
 select * , personas_vacunadas_acumuladas / poblacion * 100 as porcentaje_poblacion_total_vacunada from PopvsVac;
 
--- El campo "porcentaje_poblacion_total_vacunada" representa el porcentaje de la población total que ha sido vacunada. 
--- Puede superar el 100% debido a que una persona puede recibir múltiples dosis de la vacuna
+-- El campo "porcentaje_poblacion_total_vacunada" representa el porcentaje de la poblaciÃ³n total que ha sido vacunada. 
+-- Puede superar el 100% debido a que una persona puede recibir mÃºltiples dosis de la vacuna
 
 
 -- Forma 2: Creando una tabla.
@@ -80,11 +80,11 @@ from deaths join vaccinations
 on deaths.location = vaccinations.location and deaths.date = vaccinations.date
 where deaths.continent is not null
 
--- Obtener el porcentaje de población vacunada.
+-- Obtener el porcentaje de poblaciÃ³n vacunada.
 select * , RollingPeopleVaccinated / population * 100  as porcentaje_poblacion_total_vacunada from #PorcentajePoblacionVacunada; 
 
--- El campo "porcentaje_poblacion_total_vacunada" representa el porcentaje de la población total que ha sido vacunada. 
--- Puede superar el 100% debido a que una persona puede recibir múltiples dosis de la vacuna
+-- El campo "porcentaje_poblacion_total_vacunada" representa el porcentaje de la poblaciÃ³n total que ha sido vacunada. 
+-- Puede superar el 100% debido a que una persona puede recibir mÃºltiples dosis de la vacuna
 
 -- Eliminar la tabla temporal si se desea.
 drop table if exists #PorcentajePoblacionVacunada
